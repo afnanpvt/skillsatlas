@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill Atlas</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20256%20256%22%20role=%22img%22%3E%3Ctitle%3ESkill%20Atlas%3C/title%3E%3Crect%20width=%22256%22%20height=%22256%22%20rx=%2258%22%20fill=%22%231D1D1F%22/%3E%3Cg%20transform=%22translate(25.6%2025.6)%20scale(.8)%22%3E%3Cpath%20fill=%22%23FFFFFF%22%20d=%22M32.72%20207.67L108.72%2031.67A21%2021%200%200%201%20147.28%2031.67L223.28%20207.67A21%2021%200%200%201%20184.72%20224.33L128%2092.97L71.28%20224.33A21%2021%200%200%201%2032.72%20207.67Z%22/%3E%3Ccircle%20fill=%22%230A84FF%22%20cx=%22128%22%20cy=%22186%22%20r=%2222%22/%3E%3C/g%3E%3C/svg%3E">
+<script>
+/* apply saved look before first paint so there is no flash */
+try{const p=JSON.parse(localStorage.getItem("atlas-prefs")||"{}"),r=document.documentElement;
+if(p.theme==="light"||p.theme==="dark")r.dataset.theme=p.theme;
+if(p.accent)r.style.setProperty("--accent",p.accent);
+if(p.density==="compact")r.dataset.density="compact";
+if(p.name)document.title=p.name+"'s Skill Atlas";}catch{}
+</script>
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#f5f5f7; --surface:#fff; --text:#1d1d1f; --text2:#6e6e73; --line:rgba(0,0,0,.08);
+  --glass:rgba(245,245,247,.72); --accent:#0071e3; --danger:#ff3b30; --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  --fill:rgba(120,120,128,.14);
+  --spring:linear(0,.18 6%,.62 15%,.92 25%,1.04 36%,1.04 46%,1 60%,.995 75%,1);
+}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#000; --surface:#1c1c1e; --text:#f5f5f7; --text2:#98989d; --line:rgba(255,255,255,.1);
+  --glass:rgba(0,0,0,.66); --accent:#2997ff; --danger:#ff453a; --shadow:0 0 0 1px rgba(255,255,255,.04),0 8px 24px rgba(0,0,0,.5);}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#000; --surface:#1c1c1e; --text:#f5f5f7; --text2:#98989d; --line:rgba(255,255,255,.1);
+  --glass:rgba(0,0,0,.66); --accent:#2997ff; --danger:#ff453a; --shadow:0 0 0 1px rgba(255,255,255,.04),0 8px 24px rgba(0,0,0,.5);}}
+html[data-density=compact] .grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+html[data-density=compact] .card{padding:12px;gap:6px;border-radius:14px}
+html[data-density=compact] .card p{-webkit-line-clamp:2;font-size:13px}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:400 15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:0;z-index:10;background:var(--glass);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--line)}
+.bar{max-width:1280px;margin:auto;padding:14px 24px;display:flex;gap:12px;align-items:center}
+.brand{display:flex;align-items:center;gap:9px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.logo{width:26px;height:26px;color:var(--text);flex:none}
+#brandlogo{display:flex}
+.search{flex:1;position:relative}
+.search input{width:100%;height:40px;border-radius:11px;border:0;background:var(--fill);padding:0 52px 0 40px;font:inherit;color:var(--text);outline:none;transition:box-shadow .2s}
+.search input:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.search svg{position:absolute;left:13px;top:12px;width:16px;height:16px;stroke:var(--text2)}
+.search kbd{position:absolute;right:10px;top:9px;font:12px/22px inherit;color:var(--text2);padding:0 6px;border-radius:6px;background:var(--fill)}
+.seg{display:flex;padding:2px;border-radius:9px;background:var(--fill)}
+.seg button{padding:5px 12px;border-radius:7px;font-size:13px;color:var(--text2);transition:background .2s,color .2s,box-shadow .2s}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.ghost{padding:7px 12px;border-radius:9px;background:var(--fill);font-size:13px;transition:transform .1s}
+.ghost:active{transform:scale(.96)}
+.wrap{max-width:1280px;margin:auto;padding:0 24px 96px;display:grid;grid-template-columns:240px 1fr;gap:40px}
+aside{position:sticky;top:76px;align-self:start;padding-top:32px}
+aside button{display:flex;width:100%;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;text-align:left;color:var(--text2);transition:background .15s,color .15s,transform .1s}
+aside button:hover{background:rgba(120,120,128,.1)}
+aside button:active{transform:scale(.98)}
+aside button[aria-pressed=true]{background:rgba(120,120,128,.16);color:var(--text);font-weight:500}
+aside hr{border:0;border-top:1px solid var(--line);margin:10px 4px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+aside .n{margin-left:auto;font-size:12px;font-variant-numeric:tabular-nums}
+main{padding-top:32px;min-width:0}
+h1{font-size:clamp(2rem,4vw,2.75rem);line-height:1.05;letter-spacing:-.03em;font-weight:700}
+.sub{color:var(--text2);margin:8px 0 28px;font-size:17px;letter-spacing:-.01em;max-width:64ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:-12px 0 24px}
+.chip{padding:2px 10px;border-radius:99px;background:var(--fill);font-size:12px;color:var(--text2)}
+.chip.hit{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.sect{margin:36px 0 14px;display:flex;align-items:baseline;gap:10px}
+.sect:first-child{margin-top:0}
+.sect h2{font-size:22px;letter-spacing:-.02em}
+.sect span{color:var(--text2);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{text-align:left;background:var(--surface);border-radius:18px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .45s var(--spring),box-shadow .3s;animation:in .5s var(--spring) both;animation-delay:calc(var(--i)*12ms);position:relative}
+body.typing .card{animation:none}
+.card:hover{transform:translateY(-3px)}
+.card:active{transform:scale(.98);transition-duration:.1s}
+.card.rec{box-shadow:0 0 0 2px var(--accent),var(--shadow)}
+@keyframes in{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.card .top{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.card h3{font-size:17px;letter-spacing:-.015em;font-weight:600;word-break:break-word}
+.card p{color:var(--text2);font-size:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cmd{margin-top:auto;font:12px ui-monospace,"SF Mono",Consolas,monospace;color:var(--accent)}
+.tag{margin-left:auto;padding:1px 8px;border-radius:99px;background:var(--fill);font-size:11px}
+.tag.rec{background:var(--accent);color:#fff}
+.why{display:flex;gap:4px;flex-wrap:wrap}
+.empty{padding:80px 0;text-align:center;color:var(--text2)}
+.row{display:flex;align-items:center;gap:12px;background:var(--surface);padding:12px 16px;border-radius:14px;margin-bottom:8px;box-shadow:var(--shadow)}
+.row b{font-weight:600}.row span{color:var(--text2);font-size:13px}.row button{margin-left:auto}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+.sheet{position:fixed;z-index:21;right:16px;top:16px;bottom:16px;width:min(560px,calc(100vw - 32px));background:var(--glass);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.35);padding:28px;overflow:auto;transform:translateX(calc(100% + 48px));visibility:hidden;transition:transform .5s var(--spring),visibility 0s .5s}
+body.open .scrim{opacity:1;pointer-events:auto}
+body.open .sheet{transform:none;visibility:visible;transition-delay:0s}
+.sheet h2{font-size:28px;letter-spacing:-.025em;line-height:1.1;margin:12px 0 4px;word-break:break-word}
+.sheet .lead{font-size:17px;line-height:1.45;margin:14px 0 6px}
+.sheet .when{margin:14px 0;padding:12px 14px;border-radius:12px;background:var(--fill);font-size:14px}
+.sheet .when b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:2px}
+.tabs{margin:18px 0 14px;display:inline-flex}
+.copy{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;background:var(--fill);font:14px ui-monospace,"SF Mono",Consolas,monospace;width:100%;transition:transform .1s}
+.copy:active{transform:scale(.98)}
+.copy span:last-child{font:13px -apple-system,"Segoe UI",sans-serif;color:var(--accent)}
+.meta{color:var(--text2);font-size:13px;margin-top:14px}
+.full{font-size:14px;color:var(--text2);white-space:pre-wrap;margin-top:12px}
+pre.src{font:12.5px/1.55 ui-monospace,"SF Mono",Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:var(--surface);border-radius:12px;padding:14px;max-height:56vh;overflow:auto}
+.editor{display:block;width:100%;height:50vh;resize:vertical;font:12.5px/1.55 ui-monospace,"SF Mono",Consolas,monospace;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px;tab-size:2;outline:none;transition:box-shadow .2s}
+.editor:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.editor[readonly]{opacity:.8}
+.edbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}.spacer{flex:1}
+.ghost.primary{background:var(--accent);color:#fff}
+.ghost:disabled{opacity:.4;cursor:default}
+.setwrap{display:flex;flex-direction:column;gap:28px;max-width:720px}
+.set h3{font-size:20px;letter-spacing:-.02em;margin-bottom:10px}
+.set h4{font-size:15px;margin:18px 0 8px}
+.set .note{margin-bottom:12px}
+.field{display:flex;align-items:center;gap:16px;margin-top:14px}
+.field>span:first-child{width:90px;color:var(--text2);font-size:14px;flex:none}
+.field input{flex:1;height:40px;border-radius:11px;border:0;background:var(--surface);box-shadow:var(--shadow);padding:0 14px;font:inherit;color:var(--text);outline:none}
+.field input:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.set{min-width:0}
+.tile{display:flex;flex-direction:column;gap:8px;align-items:center;padding:8px 8px 10px;border-radius:16px;color:var(--text2);font-size:13px;box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .2s,transform .3s var(--spring)}
+.tile:hover{transform:translateY(-2px)}
+.tile:active{transform:scale(.97)}
+.tile[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--accent);color:var(--text);font-weight:500}
+.mockwrap{position:relative;width:100%}.mockwrap .half{position:absolute;inset:0;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.mock{width:100%;aspect-ratio:16/10;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;border:1px solid rgba(128,128,128,.28);background:var(--mb)}
+.mock.light{--mb:#f5f5f7;--ms:#fff;--mt:#d2d2d7}
+.mock.dark{--mb:#000;--ms:#1c1c1e;--mt:#3a3a3c}
+.m-bar{display:block;height:7px;width:38%;border-radius:4px;background:var(--mt)}
+.m-body{flex:1;display:flex;gap:6px;min-height:0}
+.m-side{display:block;width:22%;border-radius:5px;background:var(--ms);box-shadow:inset 0 0 0 1px var(--mt)}
+.m-cards{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.m-cards b{border-radius:5px;background:var(--ms);box-shadow:inset 0 0 0 1px var(--mt)}
+.m-cards b::after{content:"";display:block;height:3px;width:45%;margin:6px;border-radius:2px;background:var(--accent)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:28px;height:28px;border-radius:50%;background:var(--sw);color:#fff;font-size:12px;font-weight:600;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);transition:transform .3s var(--spring)}
+.swatch:hover{transform:scale(1.12)}
+.swatch[aria-pressed=true]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--sw)}
+.catrow{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.catrow label{color:var(--text2);font-size:13px}
+.catrow select{height:34px;border-radius:9px;border:0;background:var(--fill);color:var(--text);font:inherit;font-size:14px;padding:0 10px}
+/* sidebar: Library (content) above, Manage (app pages) pinned below */
+aside{display:flex;flex-direction:column;height:calc(100vh - 92px);overflow-y:auto;scrollbar-width:thin}
+.navlabel{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);padding:8px 12px 6px}
+.navfoot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--bg)}
+.navfoot button{gap:12px}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.navfoot button[aria-pressed=true] .ic{color:var(--accent)}
+.navadd{margin-top:2px;font-size:14px}
+.navadd .ic{width:14px;height:14px;margin:0 -1px 0 -1px}
+/* page header */
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;min-height:19px}
+.titlebar{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;padding-bottom:6px}
+.actions .ghost,.empty .ghost{display:inline-flex;align-items:center;gap:6px}
+.actions .ic,.empty .ic{width:15px;height:15px}
+.sub:empty{display:none}
+body[data-page=manage] #src{visibility:hidden}
+/* settings-style pages */
+.pg{max-width:720px}
+.gtitle{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin:28px 0 8px 16px}
+.gtitle:first-child{margin-top:0}
+.group{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;display:block}
+.item{display:flex;align-items:center;gap:14px;padding:13px 16px;min-height:52px;width:100%;text-align:left}
+.item+.item{border-top:1px solid var(--line)}
+.item.col{flex-direction:column;align-items:stretch;gap:6px}
+.item .irow{display:flex;align-items:center;gap:14px}
+.item .grow{flex:1;min-width:0}
+.item .lbl{font-weight:500}
+.item .desc{color:var(--text2);font-size:13px;line-height:1.4}
+.item .ico{color:var(--text2);display:flex}
+.item .ico .ic{width:20px;height:20px}
+.item .tag{margin-left:0}
+.bare{flex:1;min-width:0;border:0;background:transparent;font:inherit;color:var(--text);outline:none;height:28px}
+.bare.right{text-align:right}
+.linkrow{color:var(--accent);font-weight:500}
+.linkrow .ic{width:16px;height:16px}
+.gnote{color:var(--text2);font-size:13px;margin:8px 16px 0}
+.group .item .desc.mono{font-size:12px}
+.empty .ic{width:36px;height:36px;color:var(--text2);margin-bottom:6px}
+.empty p{margin-bottom:14px}
+/* add-skills picker */
+.sheet .eyebrow{margin:0}
+.pickq{display:block;width:100%;height:40px;border-radius:11px;border:0;background:var(--fill);padding:0 14px;font:inherit;color:var(--text);outline:none;margin:14px 0 10px}
+.pickq:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.picklist{max-height:calc(100vh - 340px);overflow:auto;border-radius:14px;background:var(--surface)}
+.prow{display:flex;gap:12px;padding:11px 14px;cursor:pointer;align-items:flex-start}
+.prow+.prow{border-top:1px solid var(--line)}
+.prow:hover{background:var(--fill)}
+.prow input{margin-top:4px;width:17px;height:17px;accent-color:var(--accent);flex:none}
+.pbody{min-width:0;display:flex;flex-direction:column;gap:2px}
+.pmain{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pdom{display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-size:12px}
+.psum{color:var(--text2);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pickfoot{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.addroot{display:flex;gap:8px;margin-bottom:20px}
+.addroot input{flex:1;height:42px;border-radius:11px;border:0;background:var(--surface);box-shadow:var(--shadow);padding:0 14px;font:inherit;color:var(--text);outline:none}
+.addroot input:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.addroot .ghost{height:42px;padding:0 18px}
+.srcrow{background:var(--surface);padding:14px 16px;border-radius:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.srchead{display:flex;align-items:center;gap:12px}.srchead>div:first-child{flex:1}
+.srchead span{color:var(--text2);font-size:13px}.srchead .tag{color:var(--text)}
+.srcrow details{margin-top:10px}.srcrow summary{cursor:pointer;color:var(--accent);font-size:13px}
+.plist{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:6px}
+.plist li{display:grid;grid-template-columns:86px minmax(0,1fr);gap:2px 10px;font-size:13px;color:var(--text2)}
+.plist li code{font:12px ui-monospace,Consolas,monospace;color:var(--text);word-break:break-all}
+.plist li span:last-child{grid-column:2}
+.lvl{font-size:11px;font-weight:600;padding:1px 8px;border-radius:99px;height:fit-content;text-align:center}
+.lvl.warning{background:color-mix(in srgb,#ff9f0a 20%,transparent);color:#ff9f0a}
+.lvl.skipped{background:var(--fill);color:var(--text2)}
+.aboutlogo .logo{width:40px;height:40px}
+a.ghost{text-decoration:none;color:var(--text);display:inline-block}
+.mono{font-family:ui-monospace,"SF Mono",Consolas,monospace;word-break:break-all}
+#edstate{margin-top:8px}
+.file{display:flex;justify-content:space-between;width:100%;padding:8px 10px;border-radius:8px;text-align:left;font:13px ui-monospace,Consolas,monospace}
+.file:hover{background:var(--fill)}.file span{color:var(--text2)}
+.close{position:absolute;right:18px;top:18px;width:30px;height:30px;border-radius:50%;background:var(--fill);font-size:16px;line-height:30px}
+.danger-zone{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn-danger{padding:8px 14px;border-radius:10px;color:var(--danger);background:color-mix(in srgb,var(--danger) 12%,transparent);font-weight:500;transition:transform .1s}
+.btn-danger.sure{background:var(--danger);color:#fff}
+.btn-danger:active{transform:scale(.96)}
+.note{color:var(--text2);font-size:13px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,120px);z-index:30;background:var(--glass);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--line);box-shadow:0 12px 40px rgba(0,0,0,.3);padding:10px 16px;border-radius:99px;display:flex;gap:14px;align-items:center;transition:transform .5s var(--spring);font-size:14px}
+.toast.show{transform:translate(-50%,0)}
+.toast button{color:var(--accent);font-weight:500}
+@media(max-width:820px){
+  .wrap{grid-template-columns:1fr;gap:0}
+  aside{position:static;display:flex;flex-direction:row;height:auto;gap:6px;overflow-x:auto;padding:16px 0 0;margin:0 -24px;padding-inline:24px;scrollbar-width:none}
+  .navlabel{display:none}.navfoot{display:contents}
+  aside button{width:auto;white-space:nowrap;background:rgba(120,120,128,.1);flex:none}
+  aside .n,aside hr{display:none}
+  .bar{flex-wrap:wrap}.brand span#brand{display:none}
+  .sheet{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:86vh;transform:translateY(calc(100% + 16px))}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:opacity .2s!important}
+  .sheet{transform:none;opacity:0}body.open .sheet{opacity:1}
+  .toast{transform:translate(-50%,0);opacity:0}.toast.show{opacity:1}
+}
+@media(prefers-reduced-transparency:reduce){header,.sheet,.toast{backdrop-filter:none;background:var(--surface)}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <div class="brand"><span id="brandlogo"></span><span id="brand">Skill Atlas</span></div>
+  <label class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="What are you about to do? e.g. design a screen, fix a bug, make a promo video" autocomplete="off" aria-label="Search skills by what you want to do">
+    <kbd>/</kbd>
+  </label>
+  <div class="seg" id="src" role="group" aria-label="Source">
+    <button aria-pressed="true" data-v="">All</button><button aria-pressed="false" data-v="Personal">Mine</button><button aria-pressed="false" data-v="Custom">Added</button><button aria-pressed="false" data-v="Plugin">Plugins</button>
+  </div>
+  <button class="ghost" id="rescan" title="Rescan this machine">Rescan</button>
+</div></header>
+<div class="wrap">
+  <aside id="nav" aria-label="Domains"></aside>
+  <main><div class="eyebrow" id="eyebrow"></div><div class="titlebar"><h1 id="title"></h1><div class="actions" id="actions"></div></div><p class="sub" id="sub"></p><div id="chips" class="chips"></div><div id="grid"></div></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Skill details"></section>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const EMBED = null/*DATA*/;
+const COLORS = ["#0a84ff","#bf5af2","#ff9f0a","#30d158","#ff375f","#64d2ff","#ffd60a","#ac8e68","#5e5ce6","#32ade6","#ff6482"];
+const $ = s => document.querySelector(s);
+const LOGO = '<svg class="logo" viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M36.39 209.26L112.39 33.26A17 17 0 0 1 143.61 33.26L219.61 209.26A17 17 0 0 1 188.39 222.74L128 82.88L67.61 222.74A17 17 0 0 1 36.39 209.26Z"/><circle fill="#0A84FF" cx="128" cy="182" r="20"/></svg>';
+$("#brandlogo").innerHTML = LOGO;
+/* ---------- Look & feel (per browser, kept in localStorage) ---------- */
+const prefs = {name:"", theme:"system", accent:"", density:"comfortable"};
+try { Object.assign(prefs, JSON.parse(localStorage.getItem("atlas-prefs")||"{}")); } catch {}
+function applyPrefs(){
+  const r = document.documentElement;
+  if (prefs.theme==="light" || prefs.theme==="dark") r.dataset.theme = prefs.theme; else delete r.dataset.theme;
+  if (prefs.accent) r.style.setProperty("--accent", prefs.accent); else r.style.removeProperty("--accent");
+  if (prefs.density==="compact") r.dataset.density = "compact"; else delete r.dataset.density;
+  const title = (prefs.name ? prefs.name + "'s " : "") + "Skill Atlas";
+  $("#brand").textContent = title; document.title = title;
+  try { localStorage.setItem("atlas-prefs", JSON.stringify(prefs)); } catch {}
+}
+const ACCENTS = [["Default",""],["Blue","#0a84ff"],["Purple","#bf5af2"],["Pink","#ff375f"],["Orange","#ff9f0a"],["Green","#30d158"],["Graphite","#8e8e93"]];
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let DATA = {domains:[],skills:[]}, dom = {}, IDX = null, trash = [];
+let state = {domain:"", src:"", q:""};
+try { Object.assign(state, JSON.parse(localStorage.getItem("atlas")||"{}"), {q:""}); } catch {}
+const STATIC = () => !!(EMBED && EMBED.static);
+
+/* ---------- API ---------- */
+async function api(path, body){
+  const r = await fetch(path, body ? {method:"POST", headers:{"Content-Type":"application/json","X-Atlas":"1"}, body:JSON.stringify(body)} : undefined);
+  const j = await r.json(); if (!r.ok) throw new Error(j.error||r.statusText); return j;
+}
+async function load(){
+  try {
+    DATA = EMBED || await api("/api/skills");
+    dom = Object.fromEntries(DATA.domains.map((d,i)=>[d.name,{...d,c:COLORS[i%COLORS.length]}]));
+    if (state.domain && !state.domain.startsWith("__") && !dom[state.domain]) state.domain="";
+    buildIndex();
+    if (!STATIC()) trash = (await api("/api/trash")).items;
+    render();
+  } catch (e) {
+    $("#title").textContent = "Start the Atlas server";
+    $("#sub").textContent = "This page needs its local server to scan your machine. Double-click atlas.bat in the skill-atlas folder, or run: python server.py";
+  }
+}
+
+/* ---------- Intelligent search ---------- */
+const STOP = new Set("a an the to and or of for in on with i im m me my we want need how do does is it its use using this that when going gonna about some thing things stuff please help can could would should like get make build create new just so be at as by from into".split(" "));
+const stem = w => w.length>4 ? w.replace(/(ings?|ers?|ed|es|ly|s)$/,"") : w;
+const words = s => s.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>1&&!STOP.has(w)).map(stem);
+// words that mean the same job -> extra terms to look for
+const GROUPS = [
+ [["screen","page","interface","ui","ux","mockup","wireframe","layout","dashboard","landing","website","app","component","frontend"],["ui","interface","layout","component","page","frontend","visual"]],
+ [["architecture","architect","infrastructure","topology","blueprint","system"],["architecture","diagram","system","infrastructure","workflow","topology"]],
+ [["diagram","flowchart","flow","sequence","erd"],["diagram","workflow","sequence","architecture"]],
+ [["bug","error","broken","crash","fix","failing","fails","issue"],["debug","debugging","bug","failure","root","cause"]],
+ [["test","tests","tdd","coverage"],["test","testing","tdd"]],
+ [["plan","planning","roadmap","spec","strategy","breakdown"],["plan","planning","roadmap","phase"]],
+ [["video","clip","promo","reel","teaser","trailer","launch"],["video","motion","animation","render"]],
+ [["animate","animation","motion","transition","easing","spring","hover"],["animation","motion","transition","spring","keyframes"]],
+ [["pdf","word","docx","excel","spreadsheet","xlsx","powerpoint","pptx","slides","deck","presentation","document"],["pdf","docx","xlsx","pptx","slides","document"]],
+ [["database","sql","postgres","backend","supabase","schema"],["database","postgres","supabase","sql"]],
+ [["review","audit","critique","check","inspect"],["review","audit","critique"]],
+ [["deploy","ship","release","publish"],["deploy","ship","release","pull","request"]],
+ [["clone","copy","replicate","recreate","reverse"],["clone","replicate","reverse","engineer"]],
+ [["color","colour","palette","font","typography","spacing","theme"],["color","palette","typography","design","system","theme"]],
+ [["brand","logo","identity"],["brand","logo","identity","kit"]],
+ [["browser","scrape","automate","click"],["browser","automation","scrape"]],
+ [["memory","remember","notes","log"],["memory","knowledge","graph","observation"]],
+ [["skill","skills","plugin"],["skill","skills","creator"]],
+ [["mobile","iphone","ios","ipad","android","watch","mac","tv","vision"],["ios","android","mobile","apple","guidelines"]],
+ [["slow","performance","optimize","faster","speed"],["performance","optimize","bundle"]],
+ [["secure","security","vulnerability","auth"],["security","vulnerability","audit"]],
+ [["explain","understand","learn","explore","codebase"],["codebase","graph","explore","architecture","map"]],
+ [["commit","git","branch","worktree"],["commit","git","branch","worktree","pull"]],
+ [["refactor","cleanup","simplify","debt"],["simplify","refactor","debt","cleanup"]],
+].map(([t,e])=>[new Set(t.map(stem)), e.map(stem)]);
+// hand-picked "if you say X, these skills are the answer" (points added to text score)
+const INTENTS = [
+ [/architect|system design|infrastructure|topology|blueprint/, {archify:10,graphify:4,"gsd-map-codebase":3,"writing-plans":3,brainstorming:3}],
+ [/diagram|flowchart|sequence|erd|workflow chart/, {archify:10,"figma-generate-diagram":5}],
+ [/screen|page|\bui\b|\bux\b|interface|mockup|wireframe|dashboard|landing|layout|component|frontend|website design/, {"design-taste-frontend":8,impeccable:8,"frontend-design":7,"ui-ux-pro-max":6,"image-to-code":4,"figma-generate-design":4,"apple-design":4,"high-end-visual-design":3,"minimalist-ui":2}],
+ [/redesign|upgrade.*(ui|design)|looks? (bad|generic|bland)/, {"redesign-existing-projects":10,impeccable:5}],
+ [/ios|iphone/, {"ios-design-guidelines":10,"apple-design":4}],
+ [/ipad/, {"ipados-design-guidelines":10}], [/android|material/, {"android-design-guidelines":10}],
+ [/\bmac\b|macos|desktop app/, {"macos-design-guidelines":10}], [/watch/, {"watchos-design-guidelines":10}],
+ [/apple tv|tvos/, {"tvos-design-guidelines":10}], [/vision ?pro|visionos/, {"visionos-design-guidelines":10}],
+ [/video|promo|teaser|trailer|reel|launch clip|demo clip/, {onetake:9,brag:8,hyperframes:8}],
+ [/animat|transition|motion|spring|easing|hover/, {"transitions-dev":8,"emil-design-eng":6,"apple-design":5,"hyperframes-animation":5}],
+ [/bug|broken|error|crash|not working|failing|fails|exception/, {"systematic-debugging":10,"gsd-debug":6,debug:6}],
+ [/\btests?\b|tdd|coverage/, {"test-driven-development":8,"gsd-add-tests":4}],
+ [/plan|roadmap|break ?down|spec/, {"writing-plans":8,"gsd-plan-phase":6,brainstorming:4}],
+ [/idea|brainstorm|not sure what|explore options/, {brainstorming:9,"gsd-explore":5}],
+ [/clone|copy.*site|replicate|recreate.*(site|page)/, {"clone-website":10}],
+ [/pdf/, {pdf:10}], [/\bword\b|docx/, {docx:10}], [/excel|spreadsheet|xlsx/, {xlsx:10}], [/powerpoint|pptx|slides|\bdeck\b/, {pptx:10}],
+ [/brand|logo/, {brandkit:10,brand:6}],
+ [/review|audit|critique/, {"code-review":8,"requesting-code-review":5,"web-design-guidelines":4,impeccable:3}],
+ [/(create|make|write|author|new) (a |my |new )?skill|skill (creator|authoring)/, {"skill-creator":10,"task-observer":3}],
+ [/(find|search|is there|what|which) (a )?skills?|skills? (exist|available|for)/, {"find-skills":8}],
+ [/codebase|understand (the )?(code|project)|explore (the )?(code|repo)|\bmap\b/, {graphify:8,"gsd-map-codebase":5,"smart-explore":5,"learn-codebase":5}],
+ [/database|\bsql\b|postgres|supabase/, {supabase:9,"supabase-postgres-best-practices":8}],
+ [/browser|scrape|automate (a )?site|click through/, {"agent-browser":10}],
+ [/commit|ship|release|deploy|pull request|\bpr\b/, {"gsd-ship":6,commit:6,"finishing-a-development-branch":6}],
+ [/react|next\.?js|slow|performance|bundle/, {"vercel-react-best-practices":9}],
+ [/simplif|refactor|clean ?up|tech debt/, {simplify:8,"ponytail-debt":5,"ponytail-review":4}],
+ [/color|palette|font|typograph|spacing/, {"ui-ux-pro-max":6,impeccable:5,"design-system":4}],
+ [/accessib|a11y|contrast/, {"accessibility-review":8,"ui-ux-pro-max":4,impeccable:3}],
+ [/memory|remember|knowledge/, {graphify:5,"mem-search":6,"import-memory":4}],
+];
+function buildIndex(){
+  const docs = DATA.skills.map(s=>({name:new Set(words(s.name.replace(/-/g," "))), desc:Object.create(null)}));
+  const df = Object.create(null);
+  DATA.skills.forEach((s,i)=>{
+    const d = docs[i], seen = new Set();
+    for (const w of words(s.name.replace(/-/g," ")+" "+s.summary+" "+s.desc)){ d.desc[w]=(d.desc[w]||0)+1; seen.add(w); }
+    seen.forEach(w=>df[w]=(df[w]||0)+1);
+  });
+  const N = DATA.skills.length, vocab = Object.keys(df);
+  IDX = {docs, df, N, vocab};
+}
+function interpret(q){
+  const base = [...new Set(words(q))], expand = [];
+  for (const [trig, ex] of GROUPS) if (base.some(b=>trig.has(b))) ex.forEach(e=>{ if(!base.includes(e)&&!expand.includes(e)) expand.push(e); });
+  return {base, expand};
+}
+function vocabFor(t){ return IDX.vocab.filter(v=>v===t || (t.length>=5 && v.startsWith(t))); }
+function searchSkills(q){
+  const {base, expand} = interpret(q), lq = q.toLowerCase();
+  const terms = [...base.map(t=>[t,1]), ...expand.map(t=>[t,.45])]
+    .map(([t,w])=>({t,w,vs:vocabFor(t)})).filter(x=>x.vs.length);
+  const out = [];
+  DATA.skills.forEach((s,i)=>{
+    const d = IDX.docs[i]; let score = 0; const hits = new Set();
+    for (const {t,w,vs} of terms) for (const v of vs){
+      const idf = Math.log(1 + IDX.N/IDX.df[v]);
+      let p = 0;
+      if (d.name.has(v)) p += 4*idf;
+      if (d.desc[v]) p += Math.min(d.desc[v],3)*idf;
+      if (p){ score += p*w; hits.add(w===1?t:t); }
+    }
+    let boost = 0;
+    for (const [re, m] of INTENTS) if (re.test(lq) && m[s.name]) boost = Math.max(boost, m[s.name]);
+    if (score+boost>0) out.push({s, score:score+boost*1.5, boost, hits:[...hits]});
+  });
+  out.sort((a,b)=>b.score-a.score);
+  return {base, expand, results:out.slice(0,36)};
+}
+
+/* ---------- Render ---------- */
+function visibleSkills(){ return DATA.skills.filter(s => (!state.src || s.source===state.src)); }
+function card(s,i,extra={}){
+  return `<button class="card ${extra.rec?"rec":""}" style="--i:${Math.min(i,20)}" data-id="${s.id}">
+    <div class="top"><i class="dot" style="--c:${dom[s.domain].c}"></i>${esc(s.domain)}<span class="tag ${extra.rec?"rec":""}">${extra.rec?"Best fit":(s.plugin?esc(s.plugin):s.source)}</span></div>
+    <h3>${esc(s.name)}</h3><p>${esc(s.summary||"No description.")}</p>
+    ${extra.hits?.length?`<div class="why">${extra.hits.slice(0,4).map(h=>`<span class="chip hit">${esc(h)}</span>`).join("")}</div>`:""}
+    <span class="cmd">${esc(s.invoke)}</span></button>`;
+}
+const ICON = {
+  folder: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+  trash: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
+  sliders: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg>',
+  plus: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
+};
+/* Library pages show skills. Manage pages are settings-style lists. The header tells them apart. */
+function head(eyebrow, title, sub, actions){
+  $("#eyebrow").textContent = eyebrow; $("#title").textContent = title; $("#sub").textContent = sub || "";
+  $("#actions").innerHTML = actions || "";
+  document.body.dataset.page = eyebrow === "Manage" ? "manage" : "library";
+}
+function render(){
+  const list = visibleSkills(), q = state.q.trim();
+  const counts = {}; list.forEach(s=>counts[s.domain]=(counts[s.domain]||0)+1);
+  const lib = [["", "All skills", "#8e8e93", list.length], ...DATA.domains.map(d=>[d.name,d.name,dom[d.name].c,counts[d.name]||0])]
+    .map(([v,l,c,n])=>`<button data-d="${esc(v)}" aria-pressed="${state.domain===v}" style="--c:${c}"><i class="dot"></i>${esc(l)}<span class="n">${n}</span></button>`).join("");
+  const man = [["__sources","Sources","folder",(DATA.sources||[]).length], ...(STATIC() ? [] : [["__trash","Trash","trash",trash.length]]), ["__settings","Settings","sliders",""]]
+    .map(([v,l,i,n])=>`<button data-d="${v}" aria-pressed="${state.domain===v}">${ICON[i]}${l}${n!==""?`<span class="n">${n}</span>`:""}</button>`).join("");
+  $("#nav").innerHTML = `<div class="navlabel">Library</div>${lib}`
+    + (STATIC() ? "" : `<button class="navadd" data-newcat>${ICON.plus}New category</button>`)
+    + `<div class="navfoot"><div class="navlabel">Manage</div>${man}</div>`;
+  $("#chips").innerHTML = "";
+  if (state.domain==="__trash" && !STATIC()) return renderTrash();
+  if (state.domain==="__sources") return renderSources();
+  if (state.domain==="__settings") return renderSettings();
+  let html = "";
+  if (q){
+    const r = searchSkills(q), allowed = new Set(list.map(s=>s.id));
+    const res = r.results.filter(x=>allowed.has(x.s.id) && (!state.domain || x.s.domain===state.domain));
+    head("Search", res.length ? "Best matches" : "No clear match",
+      res.length ? `For "${q}"` : `Try the job you want done, like "fix a bug" or "make a promo video", rather than a tool name.`);
+    $("#chips").innerHTML = r.base.map(w=>`<span class="chip hit">${esc(w)}</span>`).join("") + r.expand.slice(0,6).map(w=>`<span class="chip">${esc(w)}</span>`).join("");
+    const top = res.length ? res[0].score : 0;
+    const best = res.filter(x=>x.boost>0 || x.score>=top*.6).slice(0,6), rest = res.filter(x=>!best.includes(x));
+    html += best.length ? `<div class="grid">${best.map((x,i)=>card(x.s,i,{rec:true,hits:x.hits})).join("")}</div>` : "";
+    if (rest.length) html += `<div class="sect"><h2>Also relevant</h2></div><div class="grid">${rest.map((x,i)=>card(x.s,i+6,{hits:x.hits})).join("")}</div>`;
+  } else {
+    const shown = state.domain ? list.filter(s=>s.domain===state.domain) : list;
+    if (state.domain){
+      const d = dom[state.domain], mine = !!d.custom && !STATIC();
+      head("Library", state.domain,
+        d.custom ? "Your category. Each skill sits in exactly one category, and its files stay where they are." : d.blurb,
+        STATIC() ? "" : `<button class="ghost primary" data-pickfor="${esc(state.domain)}">${ICON.plus}Add skills</button>`
+          + (mine ? `<button class="ghost" data-delcat="${esc(state.domain)}">Delete category</button>` : ""));
+      html = shown.length ? `<div class="grid">${shown.map((s,i)=>card(s,i)).join("")}</div>`
+        : `<div class="empty"><p>${d.custom ? "Nothing in this category yet." : "No skills here."}</p>${STATIC() ? "" : `<button class="ghost primary" data-pickfor="${esc(state.domain)}">${ICON.plus}Add skills</button>`}</div>`;
+    } else {
+      head("Library", "Everything you've got", `${DATA.skills.length} skills across ${DATA.domains.length} categories. Pick one, or just describe what you're about to do.`);
+      html = DATA.domains.map(d=>{
+        const g = shown.filter(s=>s.domain===d.name); if(!g.length) return "";
+        return `<div class="sect"><h2>${esc(d.name)}</h2><span>${esc(d.blurb)} · ${g.length}</span></div><div class="grid">${g.map((s,i)=>card(s,i)).join("")}</div>`;
+      }).join("");
+    }
+  }
+  $("#grid").innerHTML = html || `<div class="empty">Nothing here.</div>`;
+  document.querySelectorAll("#src button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===state.src));
+  try { localStorage.setItem("atlas", JSON.stringify({domain:state.domain, src:state.src})); } catch {}
+}
+function renderSources(){
+  head("Manage", "Sources", STATIC() ? "The folders this Atlas was built from."
+    : "Folders the Atlas reads skills from. Add any folder on this machine; it will tell you what it skipped and why.");
+  const add = STATIC() ? "" : `<form class="group" id="addroot"><label class="item"><span class="ico">${ICON.folder}</span><input id="rootpath" class="bare" placeholder="Paste a folder path, e.g. ~/projects/my-app" aria-label="Folder path" autocomplete="off" spellcheck="false"><button class="ghost primary" type="submit">Add folder</button></label></form>`;
+  const items = (DATA.sources||[]).map(s=>{
+    const warn = s.problems.filter(p=>p.level==="warning"), skip = s.problems.filter(p=>p.level!=="warning");
+    const bits = [warn.length?`${warn.length} warning${warn.length===1?"":"s"}`:"", skip.length+(s.more||0)?`${skip.length+(s.more||0)} not skills`:""].filter(Boolean).join(" · ");
+    const list = s.problems.map(p=>`<li><span class="lvl ${p.level}">${p.level==="warning"?"Warning":"Not a skill"}</span><code>${esc(p.path)}</code><span>${esc(p.reason)}</span></li>`).join("");
+    return `<div class="item col"><div class="irow"><span class="ico">${ICON.folder}</span>
+        <div class="grow"><div class="lbl">${esc(s.label)}</div><div class="desc mono">${esc(s.path)}</div><div class="desc">${esc(s.note)}${s.exists?"":" Folder not found."}</div></div>
+        <span class="tag">${s.count} skill${s.count===1?"":"s"}</span>${s.removable&&!STATIC()?`<button class="ghost" data-rmroot="${esc(s.path)}">Remove</button>`:""}</div>
+      ${s.problems.length?`<details><summary>${bits}</summary><ul class="plist">${list}${s.more?`<li><span>…and ${s.more} more</span></li>`:""}</ul></details>`:""}
+      ${s.truncated?`<p class="desc">Stopped after scanning ${(20000).toLocaleString()} folders. Add a more specific folder to see everything.</p>`:""}</div>`;
+  }).join("");
+  $("#grid").innerHTML = `<div class="pg">${add}<h3 class="gtitle">Folders</h3><div class="group">${items}</div></div>`;
+}
+function renderSettings(){
+  head("Manage", "Settings", STATIC() ? "How this Atlas looks to you. Saved in this browser." : "How the Atlas looks, how it sorts your skills, and where it keeps its files.");
+  const mock = k => `<div class="mock ${k}"><i class="m-bar"></i><div class="m-body"><i class="m-side"></i><div class="m-cards"><b></b><b></b><b></b><b></b></div></div></div>`;
+  const tiles = [["system","System",`<div class="mockwrap">${mock("light")}<div class="half">${mock("dark")}</div></div>`],
+                 ["light","Light",mock("light")], ["dark","Dark",mock("dark")]]
+    .map(([v,l,m])=>`<button class="tile" data-theme-pick="${v}" aria-pressed="${prefs.theme===v}">${m}<span>${l}</span></button>`).join("");
+  const swatches = ACCENTS.map(([l,c])=>`<button class="swatch" data-accent="${c}" aria-pressed="${prefs.accent===c}" aria-label="${l}" title="${l}" style="--sw:${c||"var(--accent)"}">${c?"":"A"}</button>`).join("");
+  const custom = DATA.domains.filter(d=>d.custom), moved = DATA.skills.filter(s=>s.overridden);
+  const cats = STATIC() ? "" : `<h3 class="gtitle">Categories</h3><div class="group">
+      ${custom.length ? custom.map(d=>`<div class="item"><i class="dot" style="--c:${dom[d.name].c}"></i><div class="grow"><div class="lbl">${esc(d.name)}</div><div class="desc">${DATA.skills.filter(s=>s.domain===d.name).length} skills</div></div><button class="ghost" data-pickfor="${esc(d.name)}">Add skills</button><button class="ghost" data-delcat="${esc(d.name)}">Delete</button></div>`).join("")
+        : `<div class="item"><div class="grow desc">You haven't made any categories yet.</div></div>`}
+      <button class="item linkrow" data-newcat>${ICON.plus}<span>New category...</span></button></div>
+    <p class="gnote">Skills are sorted automatically. Add existing skills to your own category and they appear only there. Nothing is copied, renamed or moved on disk.</p>
+    ${moved.length ? `<h3 class="gtitle">Skills you moved</h3><div class="group">${moved.map(s=>`<div class="item"><div class="grow"><div class="lbl">${esc(s.name)}</div><div class="desc">${esc(s.auto_domain)} → ${esc(s.domain)}</div></div><button class="ghost" data-resetcat="${esc(s.name)}">Reset</button></div>`).join("")}</div>` : ""}`;
+  const p = DATA.paths || {};
+  const files = [["Skills folder",p.skills],["Settings file",p.settings],["Trash",p.trash],["Saved versions",p.history]].filter(x=>x[1])
+    .map(([l,v])=>`<div class="item col"><div class="lbl">${l}</div><div class="desc mono">${esc(v)}</div></div>`).join("");
+  $("#grid").innerHTML = `<div class="pg">
+    <h3 class="gtitle">Profile</h3><div class="group"><label class="item"><span class="lbl">Name</span><input id="prefname" class="bare right" value="${esc(prefs.name)}" placeholder="Shown in the header" maxlength="30" autocomplete="off"></label></div>
+    <h3 class="gtitle">Appearance</h3><div class="group">
+      <div class="item col"><div class="tiles">${tiles}</div></div>
+      <div class="item"><span class="lbl grow">Accent</span><div class="swatches">${swatches}</div></div>
+      <div class="item"><span class="lbl grow">Card size</span><div class="seg">${[["comfortable","Comfortable"],["compact","Compact"]].map(([v,l])=>`<button data-dens="${v}" aria-pressed="${prefs.density===v}">${l}</button>`).join("")}</div></div></div>
+    ${cats}
+    <h3 class="gtitle">Files</h3><div class="group">${files}</div>
+    <p class="gnote">The Atlas never deletes your skills. Removed ones go to Trash, and every save keeps the previous version.</p>
+    <h3 class="gtitle">About</h3><div class="group"><div class="item"><span class="aboutlogo">${LOGO}</span><div class="grow"><div class="lbl">Skill Atlas</div><div class="desc">${DATA.version ? "Version " + esc(DATA.version) + " · " : ""}Free and open source, MIT licensed</div></div><a class="ghost" href="https://github.com/afnanpvt/skillsatlas" target="_blank" rel="noopener">GitHub</a></div></div></div>`;
+}
+function renderTrash(){
+  head("Manage", "Trash", "Removed skills wait here. Restore puts them back exactly where they were. The Atlas never deletes anything for good.");
+  $("#grid").innerHTML = `<div class="pg">` + (trash.length
+    ? `<div class="group">${trash.map(t=>`<div class="item"><span class="ico">${ICON.trash}</span><div class="grow"><div class="lbl">${esc(t.origin)}</div><div class="desc mono">${esc(t.trash)}</div></div><button class="ghost" data-restore="${esc(t.trash)}">Restore</button></div>`).join("")}</div>`
+    : `<div class="empty">${ICON.trash}<p>Trash is empty.</p></div>`) + `</div>`;
+}
+
+/* ---------- Add existing skills to a category ---------- */
+let picker = null;
+function pickRows(){
+  const q = picker.q.trim(), base = q ? searchSkills(q).results.map(x=>x.s) : DATA.skills;
+  const rows = base.filter(s=>s.domain!==picker.domain).slice(0,200);
+  return rows.length ? rows.map(s=>`<label class="prow"><input type="checkbox" data-pick="${esc(s.name)}" ${picker.sel.has(s.name)?"checked":""}>
+      <span class="pbody"><span class="pmain"><b>${esc(s.name)}</b><span class="pdom"><i class="dot" style="--c:${dom[s.domain].c}"></i>${esc(s.domain)}</span></span><span class="psum">${esc(s.summary||"")}</span></span></label>`).join("")
+    : `<p class="note">Nothing matches.</p>`;
+}
+function pickState(){
+  const n = picker.sel.size, go = document.querySelector("[data-pickgo]");
+  $("#pickcount").textContent = n ? `${n} selected` : "Choose the skills to add";
+  go.disabled = !n; go.textContent = n ? `Add ${n}` : "Add";
+}
+function openPicker(domain){
+  cur = null; ed = null; picker = {domain, sel:new Set(), q:""};
+  $("#sheet").innerHTML = `<button class="close" aria-label="Close">×</button>
+    <div class="eyebrow">Add skills to</div><h2>${esc(domain)}</h2>
+    <p class="note">A skill belongs to one category, so adding it here takes it out of its current one. Only the Atlas's sorting changes; no files move.</p>
+    <input id="pickq" class="pickq" placeholder="Search your skills, or describe the job" autocomplete="off" aria-label="Search skills to add">
+    <div id="picklist" class="picklist">${pickRows()}</div>
+    <div class="pickfoot"><span id="pickcount" class="note"></span><button class="ghost primary" data-pickgo disabled>Add</button></div>`;
+  document.body.classList.add("open"); pickState(); $("#pickq").focus({preventScroll:true});
+}
+async function pickGo(){
+  const domain = picker.domain, names = [...picker.sel];
+  try {
+    const r = await api("/api/category/assign", {domain, skills:names});
+    closeSheet(); await load();
+    toast(`Added ${r.count} skill${r.count===1?"":"s"} to ${domain}`);
+  } catch(e){ toast(e.message); }
+}
+
+/* ---------- Detail sheet ---------- */
+let cur = null, sheetTab = "overview", detail = null, ed = null, armed = false;
+const dirty = () => !!(ed && ed.text !== ed.content);
+const leaveOk = () => !dirty() || confirm("You have unsaved edits to " + ed.path + ". Discard them?");
+async function openSheet(id){
+  cur = DATA.skills.find(s=>s.id===id); sheetTab="overview"; detail=null; ed=null; armed=false;
+  document.body.classList.add("open"); drawSheet();
+  if (!STATIC()) { try {
+    detail = await api("/api/skill?id="+id);
+    ed = {path:detail.main, content:detail.content, text:detail.content, mtime:detail.mtime, editable:cur.editable};
+    drawSheet();
+  } catch {} }
+}
+function edState(){
+  const note = $("#edstate"), save = document.querySelector("[data-save]"), rev = document.querySelector("[data-revert]");
+  if (!note) return;
+  note.textContent = !ed.editable ? "Read-only. Plugin files are overwritten by plugin updates, so copy the skill into your personal skills folder to customize it."
+    : dirty() ? "Unsaved changes. Press Ctrl+S to save; the previous version is kept in skills-history." : "Saved.";
+  if (save) save.disabled = !dirty();
+  if (rev) rev.disabled = !dirty();
+}
+async function saveEd(){
+  if (!dirty() || !ed.editable) return;
+  try {
+    const r = await api("/api/save", {id:cur.id, path:ed.path, content:ed.text, mtime:ed.mtime});
+    ed.content = ed.text; ed.mtime = r.mtime; edState();
+    if (ed.path===detail.main){ const id = cur.id; await load(); cur = DATA.skills.find(s=>s.id===id) || cur; }
+    toast("Saved " + ed.path);
+  } catch(e){ toast(e.message); }
+}
+function tryClose(){ if (leaveOk()) closeSheet(); }
+function drawSheet(){
+  const s = cur; if(!s) return;
+  const tabs = STATIC() ? "" : `<div class="seg tabs" role="tablist">${["overview","source","files"].map(t=>`<button role="tab" data-tab="${t}" aria-pressed="${sheetTab===t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div>`;
+  let body = "";
+  if (sheetTab==="overview"){
+    body = `<p class="lead">${esc(s.summary||"No description.")}</p>
+      ${s.when?`<div class="when"><b>Reach for it when</b>${esc(s.when)}</div>`:""}
+      <button class="copy" data-cmd="${esc(s.invoke)}"><span>${esc(s.invoke)}</span><span>Copy</span></button>
+      ${STATIC() ? "" : `<div class="catrow"><label for="catsel">Category</label><select id="catsel">${DATA.domains.map(d=>`<option value="${esc(d.name)}" ${d.name===s.domain?"selected":""}>${esc(d.name)}</option>`).join("")}<option value="__new">+ New category...</option></select>${s.overridden?`<button class="ghost" data-catreset>Reset</button><span class="note" style="margin:0">Automatic: ${esc(s.auto_domain)}</span>`:""}</div>`}
+      <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Full description</summary><p class="full">${esc(s.desc)}</p></details>
+      ${s.also?.length?`<p class="meta">Also installed as ${s.also.map(esc).join(", ")}</p>`:""}
+      <p class="meta">${s.plugin?`Plugin: ${esc(s.plugin)} · `:""}${s.source} · updated ${s.updated}${detail?` · ${esc(detail.dir)}`:""}</p>`;
+  } else if (sheetTab==="source"){
+    body = ed ? `<div class="edbar"><span class="note">${esc(ed.path)}${ed.editable?"":" · read-only"}</span>
+        ${ed.editable?`<span class="spacer"></span><button class="ghost" data-revert>Revert</button><button class="ghost primary" data-save>Save</button>`:""}</div>
+      <textarea id="edit" class="editor" spellcheck="false" aria-label="Contents of ${esc(ed.path)}" ${ed.editable?"":"readonly"}>${esc(ed.text)}</textarea>
+      <p class="note" id="edstate"></p>
+      ${ed.path!==detail.main?`<button class="ghost" style="margin-top:10px" data-tab="files">Back to files</button>`:""}` : `<p class="note">Loading...</p>`;
+  } else {
+    body = detail ? detail.files.map(f=>`<button class="file" data-file="${esc(f.path)}">${esc(f.path)}<span>${f.size>1024?(f.size/1024).toFixed(1)+" KB":f.size+" B"}</span></button>`).join("") : `<p class="note">Loading...</p>`;
+  }
+  let zone = "";
+  if (!STATIC()) zone = s.removable
+    ? `<div class="danger-zone">${armed
+        ? `<button class="btn-danger sure" data-remove="1">Yes, move to Trash</button><button class="ghost" data-cancel="1">Cancel</button><span class="note">You can restore it from Trash.</span>`
+        : `<button class="btn-danger" data-arm="1">Remove skill</button><span class="note">Moves the folder to Trash. Not deleted.</span>`}</div>`
+    : `<div class="danger-zone"><span class="note">${s.source==="Plugin"?`Installed by plugin <b>${esc(s.plugin)}</b>. Uninstall the plugin from Claude Code to remove it.`:"This skill comes from a folder you added. Remove that folder from Sources to stop listing it; the Atlas never deletes your files."}</span></div>`;
+  $("#sheet").innerHTML = `<button class="close" aria-label="Close">×</button>
+    <div style="display:flex;gap:8px;align-items:center;color:var(--text2);font-size:13px"><i class="dot" style="--c:${dom[s.domain].c}"></i>${esc(s.domain)}</div>
+    <h2>${esc(s.name)}</h2>${tabs}${body}${zone}`;
+  if (sheetTab==="source") edState(); else $("#sheet .close").focus({preventScroll:true});
+}
+const closeSheet = () => { document.body.classList.remove("open"); cur=null; picker=null; };
+let toastT;
+function toast(msg, actionLabel, action){
+  const t = $("#toast"); t.innerHTML = `<span>${esc(msg)}</span>${actionLabel?`<button>${esc(actionLabel)}</button>`:""}`;
+  if (actionLabel) t.querySelector("button").onclick = () => { t.classList.remove("show"); action(); };
+  t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 7000);
+}
+async function removeCur(){
+  const s = cur;
+  try {
+    const r = await api("/api/remove", {id:s.id}); closeSheet(); await load();
+    toast(`Moved ${s.name} to Trash`, "Undo", async()=>{ try{ await api("/api/restore",{trash:r.trash}); await load(); toast(`Restored ${s.name}`); }catch(e){ toast(e.message); } });
+  } catch(e){ armed=false; drawSheet(); toast(e.message); }
+}
+
+/* ---------- Events ---------- */
+document.addEventListener("click", async e=>{
+  const t = e.target;
+  if (t.closest(".close") || t.id==="scrim") return tryClose();
+  if (t.closest("[data-save]")) return saveEd();
+  if (t.closest("[data-revert]")){ ed.text = ed.content; return drawSheet(); }
+  const copy = t.closest(".copy");
+  if (copy){ navigator.clipboard?.writeText(copy.dataset.cmd); copy.lastElementChild.textContent="Copied"; return setTimeout(()=>copy.lastElementChild.textContent="Copy",1400); }
+  if (t.closest("[data-arm]")){ armed=true; return drawSheet(); }
+  if (t.closest("[data-cancel]")){ armed=false; return drawSheet(); }
+  if (t.closest("[data-remove]")) return removeCur();
+  const tab = t.closest("[data-tab]");
+  if (tab){
+    if (!leaveOk()) return;
+    sheetTab = tab.dataset.tab;
+    if (ed && detail && ed.path!==detail.main && sheetTab==="source") ed = {path:detail.main, content:detail.content, text:detail.content, mtime:detail.mtime, editable:cur.editable};
+    return drawSheet();
+  }
+  const file = t.closest("[data-file]");
+  if (file){
+    if (!leaveOk()) return;
+    try{
+      const f = await api(`/api/file?id=${cur.id}&path=${encodeURIComponent(file.dataset.file)}`);
+      ed = {path:file.dataset.file, content:f.content, text:f.content, mtime:f.mtime, editable:f.editable};
+      sheetTab = "source"; drawSheet();
+    }catch(err){ toast(err.message); }
+    return;
+  }
+  if (t.closest("[data-newcat]")){
+    const name = (prompt("Name for the new category:") || "").split(/\s+/).join(" ").trim().slice(0,40);
+    if (!name) return;
+    try{ await api("/api/category/add",{name}); await load(); state.domain = name; render(); toast(`Created ${name}. Add skills to it from here.`); }catch(err){ toast(err.message); }
+    return;
+  }
+  const pf = t.closest("[data-pickfor]"); if (pf) return openPicker(pf.dataset.pickfor);
+  if (t.closest("[data-pickgo]")) return pickGo();
+  const th = t.closest("[data-theme-pick]"); if (th){ prefs.theme = th.dataset.themePick; applyPrefs(); return render(); }
+  const ac = t.closest("[data-accent]"); if (ac){ prefs.accent = ac.dataset.accent; applyPrefs(); return render(); }
+  const dn = t.closest("[data-dens]"); if (dn){ prefs.density = dn.dataset.dens; applyPrefs(); return render(); }
+  if (t.closest("[data-catreset]")) return setCategory(cur.name, "", `${cur.name} is back to automatic`);
+  const rc = t.closest("[data-resetcat]"); if (rc) return setCategory(rc.dataset.resetcat, "", `${rc.dataset.resetcat} is back to automatic`);
+  const dc = t.closest("[data-delcat]");
+  if (dc){
+    const name = dc.dataset.delcat, n = DATA.skills.filter(s=>s.domain===name).length;
+    if (!confirm(`Delete the category "${name}"? Its ${n} skill${n===1?"":"s"} go back to their automatic categories. No skill files are touched.`)) return;
+    try{ await api("/api/category/delete",{name}); if (state.domain===name) state.domain=""; await load(); toast("Category deleted; its skills went back to automatic"); }catch(err){ toast(err.message); }
+    return;
+  }
+  const rm = t.closest("[data-rmroot]");
+  if (rm){ try{ await api("/api/roots/remove",{path:rm.dataset.rmroot}); await load(); toast("Folder removed from the list. Its files were not touched."); }catch(err){ toast(err.message); } return; }
+  const rs = t.closest("[data-restore]");
+  if (rs){ try{ await api("/api/restore",{trash:rs.dataset.restore}); await load(); toast("Restored"); }catch(err){ toast(err.message); } return; }
+  const card = t.closest(".card"); if (card) return openSheet(card.dataset.id);
+  const nav = t.closest("#nav button"); if (nav){ state.domain = nav.dataset.d; return render(); }
+  const src = t.closest("#src button"); if (src){ state.src = src.dataset.v; render(); }
+});
+$("#rescan").addEventListener("click", async()=>{ await load(); toast(`${DATA.skills.length} skills found`); });
+$("#q").addEventListener("input", e=>{ state.q = e.target.value; state.domain = ""; document.body.classList.add("typing"); render(); });
+document.addEventListener("pointerdown", ()=>document.body.classList.remove("typing"));
+async function setCategory(skill, domain, msg){
+  try{
+    await api("/api/category", {skill, domain});
+    const id = cur && cur.id; await load();
+    if (id){ cur = DATA.skills.find(s=>s.id===id) || cur; drawSheet(); }
+    toast(msg);
+  }catch(err){ toast(err.message); if (cur) drawSheet(); }
+}
+document.addEventListener("change", e=>{
+  if (e.target.dataset.pick !== undefined && picker){
+    if (e.target.checked) picker.sel.add(e.target.dataset.pick); else picker.sel.delete(e.target.dataset.pick);
+    return pickState();
+  }
+  if (e.target.id!=="catsel" || !cur) return;
+  let domain = e.target.value;
+  if (domain==="__new"){
+    domain = (prompt("Name for the new category:") || "").trim();
+    if (!domain) return drawSheet();
+  }
+  setCategory(cur.name, domain, `Moved ${cur.name} to ${domain}`);
+});
+document.addEventListener("submit", async e=>{
+  if (e.target.id!=="addroot") return;
+  e.preventDefault();
+  try{
+    const r = await api("/api/roots/add",{path:$("#rootpath").value});
+    await load();
+    toast(`Added: ${r.skills} skill${r.skills===1?"":"s"} found` + (r.problems ? `, ${r.problems} to review` : ""));
+  }catch(err){ toast(err.message); }
+});
+document.addEventListener("input", e=>{
+  if (e.target.id==="edit" && ed){ ed.text = e.target.value; edState(); }
+  if (e.target.id==="prefname"){ prefs.name = e.target.value.trim(); applyPrefs(); }
+  if (e.target.id==="pickq" && picker){ picker.q = e.target.value; $("#picklist").innerHTML = pickRows(); }
+});
+window.addEventListener("beforeunload", e=>{ if (dirty()) e.preventDefault(); });
+document.addEventListener("keydown", e=>{
+  if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="s" && cur && sheetTab==="source"){ e.preventDefault(); return saveEd(); }
+  if (e.key==="Escape") { if (cur || picker) tryClose(); $("#q").blur(); }
+  if (e.key==="/" && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); $("#q").focus(); }
+});
+if (STATIC()) $("#rescan").hidden = true;
+applyPrefs();
+/* deep links: ?q=design+a+screen  ?view=Motion+%26+Video (or __settings, __sources)  ?theme=dark */
+const qp = new URLSearchParams(location.search);
+if (qp.has("q")) { state.q = qp.get("q"); $("#q").value = state.q; }
+if (qp.has("view")) state.domain = qp.get("view");
+if (["light","dark"].includes(qp.get("theme"))) document.documentElement.dataset.theme = qp.get("theme");
+load();
+</script>
+</body>
+</html>
