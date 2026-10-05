@@ -79,3 +79,79 @@ To update, run `pipx upgrade skillsatlas`. To remove it, run `pipx uninstall ski
 | `skillsatlas --no-browser` | Start without opening a browser tab |
 | `skillsatlas --export atlas.html` | Write a read-only copy you can share with your team |
 | `skillsatlas --version` | Show the version |
+
+## A quick tour
+
+1. **Search.** Click the search box (or press `/`) and describe what you are about to do.
+2. **Browse.** The sidebar lists your categories. Click one to see its skills.
+3. **Open a skill.** You get a plain-language summary, when to reach for it, its command (one click to copy), and three tabs: Overview, Source and Files.
+4. **Make your own categories.** Press **New category**, then **Add skills** to pick existing skills from a searchable list. A skill lives in exactly one category, so adding it to yours takes it out of its automatic one.
+5. **Add folders.** Open **Sources**, paste any folder path and press **Add folder**. You'll see which skills it found and which things it skipped.
+6. **Make it yours.** Open **Settings** for theme, accent colour, card size and your name.
+
+## Where skills come from
+
+The Atlas always reads two places, and you can add as many more as you like.
+
+| Source | What it holds | Edit | Remove |
+|---|---|---|---|
+| `~/.claude/skills` | Your personal skills | yes | yes, to Trash |
+| `~/.claude/plugins/cache` | Skills installed by plugins | no, plugin updates would overwrite edits | no, uninstall the plugin instead |
+| Folders you add | Anything on your machine | yes | remove the folder from the list; files are never touched |
+| `ATLAS_ROOTS` environment variable | Folders set outside the app (`;` separated on Windows, `:` elsewhere) | yes | n/a |
+
+### What counts as a skill
+
+A skill is a folder that contains a file named exactly `SKILL.md`. The Atlas looks up to 8 levels deep, does not look inside a skill for more skills, and skips `node_modules`, `venv`, `dist`, `build`, `__pycache__` and hidden folders (except `.claude`, `.agents`, `.codex`, `.cursor` and `.github`).
+
+| In the Sources view | What it means |
+|---|---|
+| Listed normally | `SKILL.md` with `name:` and `description:` |
+| Warning | Listed, but there is no frontmatter, no `name:` or no `description:`, so Claude can't tell when to use it |
+| Not a skill | A file named `skill.md` (wrong case), a loose `.md` with skill-style frontmatter that isn't in a `SKILL.md` folder (often a slash command), or a folder with no `SKILL.md` |
+
+If the same skill is installed more than once, you see one card with an "Also installed as" note.
+
+## Safe and private
+
+- **Local only.** The server listens on `127.0.0.1`, makes no network calls and collects nothing.
+- **Nothing is deleted.** Removing a skill moves its folder to `~/.claude/skills-trash/`. Restore it from the Trash page or the Undo toast.
+- **Edits are reversible.** Every save keeps the previous version in `~/.claude/skills-history/`. A save is refused if the file changed on disk after you opened it, so you never overwrite newer work by accident.
+- **Locked down.** Anything that changes data needs a custom request header and a `localhost` Host header, which blocks cross-site and DNS-rebinding tricks. File access is confined to the skill's own folder.
+- **You choose the folders.** Folders you add are scanned and editable, so only add folders you trust.
+
+## Configuration
+
+| Variable | Meaning |
+|---|---|
+| `ATLAS_HOME` | Use a Claude config folder other than `~/.claude` |
+| `ATLAS_PORT` | Default port (same as `--port`) |
+| `ATLAS_ROOTS` | Extra skill folders, separated by `;` on Windows or `:` elsewhere |
+
+Your categories, added folders and settings are saved in `~/.claude/skill-atlas.json`. Look and feel (theme, accent, card size, name) is saved in your browser.
+
+You can also link straight to a view: `/?q=design+a+screen`, `/?view=__settings`, `/?theme=dark`.
+
+## Make it fit your skills
+
+- **Categories and their keyword rules:** `DOMAINS` in `skillsatlas/scan.py`.
+- **Search synonyms and "if you say X, suggest skill Y" rules:** `GROUPS` and `INTENTS` in `skillsatlas/index.html`.
+
+## Contributing
+
+Issues and pull requests are very welcome. To work on it:
+
+```bash
+git clone https://github.com/afnanpvt/skillsatlas.git
+cd skillsatlas
+python -m skillsatlas --no-browser   # run it
+python tests/test_server.py          # run the tests
+```
+
+The tests start the real server against a throwaway folder and exercise listing, skill detection, folders, saving, conflicts, removal, restore, categories, the command line and a set of path-traversal attempts. Please add a test with any change to the server.
+
+The code is small on purpose: `skillsatlas/scan.py` finds and sorts skills, `skillsatlas/server.py` is the local server and command line, and `skillsatlas/index.html` is the whole interface in one file.
+
+## License
+
+[MIT](LICENSE). Use it, change it, share it.
